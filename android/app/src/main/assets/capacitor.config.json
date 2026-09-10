@@ -1,0 +1,6 @@
+{
+	"appId": "com.bandb.music",
+	"appName": "B and B Music",
+	"webDir": "dist",
+	"bundledWebRuntime": false
+}

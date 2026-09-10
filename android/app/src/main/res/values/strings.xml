@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">B and B Music</string>
+    <string name="title_activity_main">B and B Music</string>
+    <string name="package_name">com.bandb.music</string>
+    <string name="custom_url_scheme">com.bandb.music</string>
+</resources>
