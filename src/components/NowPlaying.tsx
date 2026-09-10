@@ -159,19 +159,11 @@ export function NowPlaying({ isPortrait = true, onTimer }: { isPortrait?: boolea
 
       {/* Album Art */}
       <div className={`relative ${albumSizeClass} z-10 flex-shrink-0 animate-float`}>
-        <motion.div 
-          className="rounded-full p-[1vw] backdrop-blur-md border border-border h-full w-full"
-          animate={{
-            backgroundColor: isPlaying ? PASTEL_COLORS.map(c => `${c}1A`) : 'rgba(255,255,255,0.05)',
-            boxShadow: isPlaying 
-              ? PASTEL_COLORS.map(c => `0 0 60px ${c}${actualTheme === 'dark' ? '66' : '40'}`) 
-              : `0 0 20px ${actualTheme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`
-          }}
-          transition={{
-            duration: 30,
-            repeat: Infinity,
-            ease: "linear"
-          }}
+        <div 
+          className={cn(
+            "rounded-full p-[1vw] backdrop-blur-md border border-border h-full w-full transition-all duration-1000",
+            isPlaying ? "bg-accent/10 shadow-[0_0_60px_rgba(33,150,243,0.3)]" : "bg-white/5 shadow-[0_0_20px_rgba(0,0,0,0.1)]"
+          )}
         >
           <div className={cn(
             "rounded-full p-[0.5vw] border border-border transition-all duration-700 h-full w-full",
@@ -180,48 +172,35 @@ export function NowPlaying({ isPortrait = true, onTimer }: { isPortrait?: boolea
             <div className={cn(
               "rounded-full overflow-hidden bg-bg-card relative shadow-2xl transition-all duration-700 border border-border",
               "w-full h-full aspect-square flex items-center justify-center"
-            )}>
+            )}
+            style={{ transform: 'translateZ(0)' /* Hardware acceleration */ }}
+            >
               <div 
                 className="w-full h-full animate-[spin_20s_linear_infinite]"
                 style={{
-                  animationPlayState: isPlaying ? 'running' : 'paused'
+                  animationPlayState: isPlaying ? 'running' : 'paused',
+                  willChange: 'transform' // ObjectAnimator equivalent optimization
                 }}
               >
                 <AnimatePresence mode="wait">
                   {currentSong?.coverUrl ? (
-                    <motion.img 
+                    <img 
                       key={currentSong.coverUrl}
+                      loading="lazy"
                       src={currentSong.coverUrl} 
                       className={cn(
                         "w-full h-full object-cover transition-transform duration-[2s] ease-out",
                         isPlaying ? "scale-110" : "scale-100"
                       )}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
                     />
                   ) : (
-                    <motion.div 
+                    <div 
                       key="placeholder"
-                      className="w-full h-full flex items-center justify-center relative overflow-hidden"
-                      initial={{ opacity: 0 }}
-                      animate={{ 
-                        opacity: 1,
-                        backgroundColor: PASTEL_COLORS
-                      }}
-                      exit={{ opacity: 0 }}
-                      transition={{
-                        opacity: { duration: 0.3 },
-                        backgroundColor: {
-                          duration: 30,
-                          repeat: Infinity,
-                          ease: "linear"
-                        }
-                      }}
+                      className="w-full h-full flex items-center justify-center relative overflow-hidden bg-bg-surface"
                     >
                       <div className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(circle at center, rgba(255,255,255,0.4) 0%, rgba(0,0,0,0.1) 100%)' }} />
                       <Music className="w-[15vw] h-[15vw] text-white/40 relative z-10" />
-                    </motion.div>
+                    </div>
                   )}
                 </AnimatePresence>
               </div>
@@ -231,7 +210,7 @@ export function NowPlaying({ isPortrait = true, onTimer }: { isPortrait?: boolea
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[3vw] h-[3vw] rounded-full bg-bg-primary z-20 border border-border shadow-inner" />
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
       </div>
 
