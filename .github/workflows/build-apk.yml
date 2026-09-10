@@ -2,9 +2,10 @@ name: Build Android APK
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch: # Cho phép kích ho?t th? công t? tab Actions
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -12,37 +13,50 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source code
+      # 1. Tải mã nguồn về máy chủ
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # 2. Cài đặt Node.js phiên bản 20 (LTS)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
           cache: 'npm'
 
-      - name: Setup Java 17
+      # 3. Cài đặt Java 17 cho Android Build
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: 'zulu'
           java-version: '17'
+          cache: 'gradle'
 
-      - name: Install dependencies
-        run: npm install
+      # 4. Cài đặt thư viện Node.js
+      - name: Install NPM Packages
+        run: npm ci
 
-      - name: Build Web App (Vite)
+      # 5. Build mã nguồn React/Web thành các file tĩnh (thư mục dist)
+      - name: Build Web App
         run: npm run build
 
+      # 6. Đồng bộ giao diện Web vào Capacitor (Android)
       - name: Sync Capacitor Android
         run: npx cap sync android
 
+      # 7. SỬA LỖI PERMISSION: Cấp quyền thực thi cho Gradle
+      - name: Grant Execute Permission to gradlew
+        run: chmod +x android/gradlew
+
+      # 8. Build Debug APK
       - name: Build Debug APK
         working-directory: ./android
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug --no-daemon
 
-      - name: Upload APK Artifact
+      # 9. Tải file APK lên GitHub Artifacts để bạn tải về
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug-apk
+          name: B-and-B-Music-Player-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 7
